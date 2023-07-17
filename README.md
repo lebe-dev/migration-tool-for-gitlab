@@ -1,4 +1,4 @@
-# GitLab Migration Tool
+# Migration Tool for GitLab 
 
 Migrate groups and projects from one gitlab instance to another.
 
