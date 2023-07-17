@@ -38,13 +38,15 @@ mod tests {
         let expected_config = AppConfig {
             log_level: "debug".to_string(),
             source: InstanceConfig {
-                host: "old-gitlab.company.com".to_string(),
+                host: "https://old-gitlab.company.com".to_string(),
                 token: "38jg983j4g0922323f".to_string(),
             },
             target: InstanceConfig {
-                host: "gitlab.company.com".to_string(),
+                host: "https://gitlab.company.com".to_string(),
                 token: "Fv034g3049gj290j23A".to_string(),
             },
         };
+
+        assert_eq!(expected_config, config)
     }
 }

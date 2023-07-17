@@ -4,7 +4,7 @@ use serde::Deserialize;
 
 pub mod file;
 
-#[derive(Deserialize,Debug,Clone)]
+#[derive(Deserialize,Debug,Clone,PartialEq)]
 #[serde(rename_all = "kebab-case")]
 pub struct AppConfig {
     pub log_level: String,
@@ -19,7 +19,7 @@ impl Display for AppConfig {
     }
 }
 
-#[derive(Deserialize,Debug,Clone)]
+#[derive(Deserialize,Debug,Clone,PartialEq)]
 pub struct InstanceConfig {
     pub host: String,
     pub token: String
