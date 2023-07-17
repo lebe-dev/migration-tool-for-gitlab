@@ -12,6 +12,8 @@ opt-level = "z"
 [dependencies]
 anyhow = "1"
 
+clap = "2.33.4"
+
 config = { version = "0.13.3", features = ["yaml"] }
 
 serde = { version = "1.0.163", features = ["derive"] }
