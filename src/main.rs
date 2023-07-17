@@ -2,11 +2,10 @@ use std::path::Path;
 use std::process::exit;
 
 use clap::{App, SubCommand};
-use reqwest::blocking::ClientBuilder;
 
 use crate::config::file::load_config_from_file;
 use crate::logging::get_logging_config;
-use crate::migration::group::get_group_list;
+use crate::migration::migrate_gitlab_instance;
 
 pub mod config;
 pub mod logging;
@@ -38,19 +37,24 @@ fn main() {
             match log4rs::init_config(logging_config) {
                 Ok(_) => {
 
-                    let client = ClientBuilder::new().build().unwrap();
+                    match matches.subcommand_matches(MIGRATE_COMMAND) {
+                        Some(_) => {
 
-                    match get_group_list(&client, &app_config.source) {
-                        Ok(groups) => {
-                            for group in groups {
-                                println!("- group (id {}): '{}'", group.id, group.name)
+                            match migrate_gitlab_instance(&app_config.source, &app_config.target) {
+                                Ok(_) => {
+                                    println!("-----");
+                                    println!("migration completed");
+                                }
+                                Err(e) => {
+                                    eprintln!("migration error: {}", e);
+                                    exit(EXIT_CODE_ERROR);
+                                }
                             }
+
                         }
-                        Err(e) => {
-                            eprintln!("{}", e);
-                            exit(EXIT_CODE_ERROR);
-                        }
+                        None => {}
                     }
+
                 }
                 Err(e) => {
                     eprintln!("{}", e);
