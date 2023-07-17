@@ -17,3 +17,7 @@ Do migration:
 ```shell
 ./gmt migrate
 ```
+
+## Troubleshooting
+
+Check `gmt.log` for details.
