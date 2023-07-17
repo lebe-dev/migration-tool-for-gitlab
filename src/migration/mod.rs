@@ -94,7 +94,7 @@ pub fn migrate_gitlab_instance(source: &InstanceConfig, target: &InstanceConfig)
                 }
             }
             None => {
-                error!("source group wasn't found by id {}", sg.id)
+                error!("source group wasn't found by id {}", source_project.namespace.id)
             }
         }
 
