@@ -1,0 +1,9 @@
+log-level: debug
+
+source:
+  host: old-gitlab.company.com
+  token: 38jg983j4g0922323f
+
+target:
+  host: gitlab.company.com
+  token: Fv034g3049gj290j23A

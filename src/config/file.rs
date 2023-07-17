@@ -1,0 +1,50 @@
+use std::path::Path;
+
+use anyhow::Context;
+use config::Config;
+use log::info;
+
+use crate::config::AppConfig;
+
+pub fn load_config_from_file(config_path: &Path) -> anyhow::Result<AppConfig> {
+    info!("load config from file: '{}'", config_path.display());
+
+    let config_path = format!("{}", config_path.display());
+
+    let settings = Config::builder()
+        .add_source(config::File::with_name(&config_path))
+        .build().context("unable to load app config from file")?;
+
+    let config = settings.try_deserialize::<AppConfig>()?;
+
+    info!("config:");
+    info!("{}", config);
+
+    Ok(config)
+}
+
+#[cfg(test)]
+mod tests {
+    use std::path::Path;
+
+    use crate::config::{AppConfig, InstanceConfig};
+    use crate::config::file::load_config_from_file;
+
+    #[test]
+    fn config_should_be_loaded() {
+        let config_path = Path::new("test-data").join("gmt.yml");
+        let config = load_config_from_file(&config_path).unwrap();
+
+        let expected_config = AppConfig {
+            log_level: "debug".to_string(),
+            source: InstanceConfig {
+                host: "old-gitlab.company.com".to_string(),
+                token: "38jg983j4g0922323f".to_string(),
+            },
+            target: InstanceConfig {
+                host: "gitlab.company.com".to_string(),
+                token: "Fv034g3049gj290j23A".to_string(),
+            },
+        };
+    }
+}
