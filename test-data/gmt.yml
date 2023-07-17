@@ -1,9 +1,11 @@
 log-level: debug
 
 source:
-  host: https://old-gitlab.company.com
-  token: 38jg983j4g0922323f
+  public-url: 'https://old-gitlab.company.com'
+  git-url: 'ssh://old-gitlab.company.com:2222'
+  token: '38jg983j4g0922323f'
 
 target:
-  host: https://gitlab.company.com
-  token: Fv034g3049gj290j23A
+  public-url: 'https://gitlab.company.com'
+  git-url: 'ssh://gitlab.company.com'
+  token: 'Fv034g3049gj290j23A'

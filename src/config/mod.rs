@@ -20,13 +20,15 @@ impl Display for AppConfig {
 }
 
 #[derive(Deserialize,Debug,Clone,PartialEq)]
+#[serde(rename_all = "kebab-case")]
 pub struct InstanceConfig {
-    pub host: String,
+    pub public_url: String,
+    pub git_url: String,
     pub token: String
 }
 
 impl Display for InstanceConfig {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "host: {}, token: ***********", self.host)
+        write!(f, "public-url: {}, git-url: {}, token: ***********", self.public_url, self.git_url)
     }
 }

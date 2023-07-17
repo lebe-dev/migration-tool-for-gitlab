@@ -1,9 +1,11 @@
 log-level: info
 
 source:
-  host: https://old-gitlab.company.com
-  token: CHANGE-ME
+  public-url: 'https://old-gitlab.company.com'
+  git-url: 'ssh://git@old-gitlab.company.com:22'
+  token: 'CHANGE-ME'
 
 target:
-  host: https://gitlab.company.com
-  token: CHANGE-ME
+  public-url: 'https://gitlab.company.com'
+  git-url: 'ssh://git@gitlab.company.com:2222'
+  token: 'CHANGE-ME'
