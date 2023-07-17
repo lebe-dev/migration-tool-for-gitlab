@@ -9,6 +9,7 @@ use crate::migration::migrate_gitlab_instance;
 
 pub mod config;
 pub mod logging;
+pub mod git;
 pub mod migration;
 
 #[cfg(test)]
@@ -47,6 +48,7 @@ fn main() {
                                 }
                                 Err(e) => {
                                     eprintln!("migration error: {}", e);
+                                    eprintln!("details: {}", e.root_cause());
                                     exit(EXIT_CODE_ERROR);
                                 }
                             }
