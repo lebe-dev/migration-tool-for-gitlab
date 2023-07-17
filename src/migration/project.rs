@@ -3,13 +3,13 @@ use log::{debug, error, info};
 use reqwest::blocking::Client;
 
 use crate::config::InstanceConfig;
-use crate::migration::domain::GitLabGroup;
+use crate::migration::domain::GitLabProject;
 use crate::migration::PRIVATE_TOKEN_HEADER;
 
-pub fn get_group_list(client: &Client, instance: &InstanceConfig) -> anyhow::Result<Vec<GitLabGroup>> {
-    info!("get group list for instance '{}'..", instance.host);
+pub fn get_project_list(client: &Client, instance: &InstanceConfig) -> anyhow::Result<Vec<GitLabProject>> {
+    info!("get project list for instance '{}'..", instance.host);
 
-    let url = format!("{}/api/v4/groups", instance.host);
+    let url = format!("{}/api/v4/projects", instance.host);
 
     let response = client.get(url)
         .header(PRIVATE_TOKEN_HEADER, instance.token.to_string())
@@ -32,12 +32,12 @@ pub fn get_group_list(client: &Client, instance: &InstanceConfig) -> anyhow::Res
     }
 }
 
-pub fn create_gitlab_private_group(client: &Client, instance: &InstanceConfig,
-                               group_name: &str, path: &str) -> anyhow::Result<Vec<GitLabGroup>> {
-    info!("create group '{group_name}' at instance '{}'..", instance.host);
+pub fn create_gitlab_private_project(client: &Client, instance: &InstanceConfig,
+                     group_id: u32, name: &str, path: &str) -> anyhow::Result<Vec<GitLabProject>> {
+    info!("create project '{name}' with group-id {group_id} at instance '{}'..", instance.host);
 
-    let url = format!("{}/api/v4/groups?name={}&path={}&visibility=private",
-                            instance.host, group_name, path);
+    let url = format!("{}/api/v4/projects?name={}&path={}&visibility=private&namespace_id={}",
+                      instance.host, name, path, group_id);
 
     let response = client.post(url)
         .header(PRIVATE_TOKEN_HEADER, instance.token.to_string())
@@ -46,15 +46,15 @@ pub fn create_gitlab_private_group(client: &Client, instance: &InstanceConfig,
     let response_status = response.status();
 
     if response_status == reqwest::StatusCode::OK {
-        let groups = response.json().context("unable to decode server response")?;
+        let projects = response.json().context("unable to decode server response")?;
 
         debug!("---[HTTP RESPONSE]----");
-        debug!("{:?}", groups);
+        debug!("{:?}", projects);
         debug!("---[/HTTP RESPONSE]----");
 
-        info!("group '{group_name}' has been created");
+        info!("project '{name}' has been created");
 
-        Ok(groups)
+        Ok(projects)
 
     } else {
         error!("unexpected server response code {}", response_status);

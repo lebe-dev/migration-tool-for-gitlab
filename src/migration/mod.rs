@@ -9,6 +9,9 @@ use crate::migration::group::{create_gitlab_private_group, get_group_list};
 
 pub mod domain;
 pub mod group;
+pub mod project;
+
+pub const PRIVATE_TOKEN_HEADER: &str = "PRIVATE-TOKEN";
 
 pub struct GitLabGroupIdMap {
     pub source_id: u32,
