@@ -40,6 +40,7 @@ mod tests {
 
         let expected_config = AppConfig {
             log_level: "debug".to_string(),
+            git_bin_path: "/usr/bin/git".to_string(),
             source: InstanceConfig {
                 public_url: "https://old-gitlab.company.com".to_string(),
                 git_url: "ssh://old-gitlab.company.com:2222".to_string(),

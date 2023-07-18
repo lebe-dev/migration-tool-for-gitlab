@@ -8,14 +8,15 @@ pub mod file;
 #[serde(rename_all = "kebab-case")]
 pub struct AppConfig {
     pub log_level: String,
+    pub git_bin_path: String,
     pub source: InstanceConfig,
     pub target: InstanceConfig,
 }
 
 impl Display for AppConfig {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "log-level: {}, source: {}, target: {}",
-               self.log_level, self.source, self.target)
+        write!(f, "log-level: {}, git-bin-path: '{}', source: {}, target: {}",
+               self.log_level, self.git_bin_path, self.source, self.target)
     }
 }
 

@@ -1,5 +1,7 @@
 log-level: info
 
+git-bin-path: '/usr/bin/git'
+
 source:
   public-url: 'https://old-gitlab.company.com'
   git-url: 'ssh://git@old-gitlab.company.com:22'
