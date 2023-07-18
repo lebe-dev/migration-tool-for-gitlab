@@ -1,0 +1,74 @@
+stages:
+  - build
+
+build-rockylinux8:
+  stage: build
+
+  only:
+    - main
+
+  script:
+    - cargo test
+    - cargo build --release
+    - cp target/release/gmt gmt
+    - eu-elfcompress gmt
+    - strip gmt
+    - upx -9 --lzma gmt
+
+  artifacts:
+    name: gmt-rockylinux8
+    paths:
+      - gmt
+      - README.md
+      - gmt.yml-dist
+    expire_in: 1 week
+
+  tags:
+    - rockylinux8
+
+build-rhel7:
+  stage: build
+
+  only:
+    - main
+
+  script:
+    - cargo test
+    - cargo build --release
+    - cp target/release/gmt gmt
+    - eu-elfcompress gmt
+    - strip gmt
+    - upx -9 --lzma gmt
+
+  artifacts:
+    name: gmt-rhel7
+    paths:
+      - gmt
+      - README.md
+      - gmt.yml-dist
+    expire_in: 1 week
+
+  tags:
+    - rhel7
+
+build-windows:
+  stage: build
+
+  only:
+    - main
+
+  script:
+    - cargo test
+    - cargo build --release
+    - copy target/release/zabbix-lld-ws.exe ./gmt.exe
+
+  artifacts:
+    name: gmt-windows
+    paths:
+      - gmt.exe
+      - README.md
+      - gmt.yml-dist
+    expire_in: 1 week
+
+  tags:
+    - windows
