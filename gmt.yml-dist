@@ -15,6 +15,7 @@ source:
   # Trailing port ':22' is important even for default tcp/22
   git-url: 'ssh://git@old-gitlab.company.com:22'
 
+  # Obtain token here - User Settings > Access Tokens
   token: 'CHANGE-ME'
 
 target:
@@ -23,4 +24,5 @@ target:
   # Trailing port ':22' is important
   git-url: 'ssh://git@gitlab.company.com:2222'
 
+  # Obtain token here - User Settings > Access Tokens
   token: 'CHANGE-ME'
