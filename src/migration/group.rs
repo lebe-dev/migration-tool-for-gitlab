@@ -11,6 +11,8 @@ pub fn get_group_list(client: &Client, instance: &InstanceConfig) -> anyhow::Res
 
     let url = format!("{}/api/v4/groups?per_page=100", instance.public_url);
 
+    debug!("url: {url}");
+
     let response = client.get(url)
         .header(PRIVATE_TOKEN_HEADER, instance.token.to_string())
         .send().context("gitlab api communication error")?;
@@ -33,11 +35,20 @@ pub fn get_group_list(client: &Client, instance: &InstanceConfig) -> anyhow::Res
 }
 
 pub fn create_gitlab_private_group(client: &Client, instance: &InstanceConfig,
-                               group_name: &str, path: &str) -> anyhow::Result<Vec<GitLabGroup>> {
+   group_name: &str, path: &str, parent_id: Option<u32>) -> anyhow::Result<Vec<GitLabGroup>> {
     info!("create group '{group_name}' at instance '{}'..", instance.public_url);
 
-    let url = format!("{}/api/v4/groups?name={}&path={}&visibility=private",
+    let parent_id_param = if let Some(value) = parent_id {
+        format!("&parent_id={value}")
+
+    } else {
+        "".to_string()
+    };
+
+    let url = format!("{}/api/v4/groups?name={}&path={}&visibility=private{parent_id_param}",
                       instance.public_url, group_name, path);
+
+    debug!("url: {url}");
 
     let response = client.post(url)
         .header(PRIVATE_TOKEN_HEADER, instance.token.to_string())
@@ -87,7 +98,7 @@ mod create_group_tests {
             token: "CHANGE-ME".to_string(),
         };
 
-        match create_gitlab_private_group(&client, &config, "g5000", "g5000") {
+        match create_gitlab_private_group(&client, &config, "g5000", "g5000", None) {
             Ok(groups) => {
                 info!("groups: {:?}", groups);
             }
