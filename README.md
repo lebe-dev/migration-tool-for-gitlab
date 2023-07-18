@@ -45,13 +45,13 @@ Check `gmt.log` for migration progress and details.
   - Source GitLab v10.x
   - Target GitLab v16.x
   - git v2.41.0
-- Doesn't support retry for migration steps
 
-## Resume process
+## How to resume the process
 
-Tool doesn't support any kind of retry mechanism for migration steps, if you want to resume interrupted process just restart the app.
+Tool doesn't support any kind of retry mechanism for migration steps (connection issues, etc.). 
+If you want to resume interrupted process just start app again. Tool checks if project already exists on target instance before migration.
 
-Also I would recommend you to enable `error-handlers.remove-target-repo-after-clone-error` for fresh target instance (GitLab).
+Also I would recommend you to enable `error-handlers.remove-target-repo-after-clone-error` for target instance (GitLab).
 
 
 ## Troubleshooting
