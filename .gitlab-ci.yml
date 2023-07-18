@@ -60,7 +60,7 @@ build-windows:
   script:
     - cargo test
     - cargo build --release
-    - copy target/release/zabbix-lld-ws.exe ./gmt.exe
+    - copy target/release/gmt.exe ./gmt.exe
 
   artifacts:
     name: gmt-windows
