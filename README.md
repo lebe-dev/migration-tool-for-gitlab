@@ -2,6 +2,8 @@
 
 Migrate groups and projects from one gitlab instance to another.
 
+[How to setup demo environment](DEMO.md)
+
 ## How to use
 
 Prepare config:
