@@ -6,10 +6,27 @@ use crate::config::InstanceConfig;
 use crate::migration::domain::{GitLabProject, GitLabRepositoryBranch};
 use crate::migration::PRIVATE_TOKEN_HEADER;
 
-pub fn get_project_list(client: &Client, instance: &InstanceConfig) -> anyhow::Result<Vec<GitLabProject>> {
+pub fn get_all_projects(client: &Client, instance: &InstanceConfig) -> anyhow::Result<Vec<GitLabProject>> {
+    let mut page = 1;
+
+    let mut results: Vec<GitLabProject> = vec![];
+
+    let mut groups = get_project_list(&client, &instance, page)?;
+
+    while !groups.is_empty() {
+        results.append(&mut groups);
+
+        page += 1;
+        groups = get_project_list(&client, &instance, page)?;
+    }
+
+    Ok(results)
+}
+
+pub fn get_project_list(client: &Client, instance: &InstanceConfig, page: u32) -> anyhow::Result<Vec<GitLabProject>> {
     info!("get project list for instance '{}'..", instance.public_url);
 
-    let url = format!("{}/api/v4/projects?per_page=100", instance.public_url);
+    let url = format!("{}/api/v4/projects?per_page=100&page={page}", instance.public_url);
 
     debug!("url: {url}");
 
@@ -20,13 +37,13 @@ pub fn get_project_list(client: &Client, instance: &InstanceConfig) -> anyhow::R
     let response_status = response.status();
 
     if response_status == reqwest::StatusCode::OK {
-        let groups = response.json().context("unable to decode server response")?;
+        let projects = response.json().context("unable to decode server response")?;
 
         debug!("---[HTTP RESPONSE]----");
-        debug!("{:?}", groups);
+        debug!("{:?}", projects);
         debug!("---[/HTTP RESPONSE]----");
 
-        Ok(groups)
+        Ok(projects)
 
     } else {
         error!("unexpected server response code {}", response_status);
@@ -38,7 +55,7 @@ pub fn get_project_branches(client: &Client, instance: &InstanceConfig,
                             project_id: u32) -> anyhow::Result<Vec<String>> {
     info!("get project (id {project_id}) branches, for instance '{}'..", instance.public_url);
 
-    let url = format!("{}/api/v4/projects/{project_id}/repository/branches", instance.public_url);
+    let url = format!("{}/api/v4/projects/{project_id}/repository/branches?per_page=100", instance.public_url);
 
     debug!("url: {url}");
 

@@ -6,10 +6,27 @@ use crate::config::InstanceConfig;
 use crate::migration::domain::GitLabGroup;
 use crate::migration::PRIVATE_TOKEN_HEADER;
 
-pub fn get_group_list(client: &Client, instance: &InstanceConfig) -> anyhow::Result<Vec<GitLabGroup>> {
+pub fn get_all_groups(client: &Client, instance: &InstanceConfig) -> anyhow::Result<Vec<GitLabGroup>> {
+    let mut groups_page = 1;
+
+    let mut results: Vec<GitLabGroup> = vec![];
+
+    let mut groups = get_group_list(&client, &instance, groups_page)?;
+
+    while !groups.is_empty() {
+        results.append(&mut groups);
+
+        groups_page += 1;
+        groups = get_group_list(&client, &instance, groups_page)?;
+    }
+
+    Ok(results)
+}
+
+pub fn get_group_list(client: &Client, instance: &InstanceConfig, page: u32) -> anyhow::Result<Vec<GitLabGroup>> {
     info!("get group list for instance '{}'..", instance.public_url);
 
-    let url = format!("{}/api/v4/groups?per_page=100", instance.public_url);
+    let url = format!("{}/api/v4/groups?per_page=100&page={page}", instance.public_url);
 
     debug!("url: {url}");
 
