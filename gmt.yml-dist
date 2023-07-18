@@ -4,10 +4,16 @@ git-bin-path: '/usr/bin/git'
 
 source:
   public-url: 'https://old-gitlab.company.com'
+
+  # Trailing port ':22' is important even for default tcp/22
   git-url: 'ssh://git@old-gitlab.company.com:22'
+
   token: 'CHANGE-ME'
 
 target:
   public-url: 'https://gitlab.company.com'
+
+  # Trailing port ':22' is important
   git-url: 'ssh://git@gitlab.company.com:2222'
+
   token: 'CHANGE-ME'
