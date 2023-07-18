@@ -2,6 +2,9 @@ log-level: debug
 
 git-bin-path: '/usr/bin/git'
 
+error-handlers:
+  remove-target-repo-after-clone-error: true
+
 source:
   public-url: 'https://old-gitlab.company.com'
   git-url: 'ssh://old-gitlab.company.com:2222'

@@ -114,3 +114,29 @@ pub fn create_gitlab_private_project(client: &Client, instance: &InstanceConfig,
         Err(anyhow!("unexpected server response"))
     }
 }
+
+/// API: https://docs.gitlab.com/ee/api/projects.html#delete-project
+pub fn remove_gitlab_project(client: &Client, instance: &InstanceConfig,
+                             project_id: u32) -> anyhow::Result<()> {
+    info!("remove project with id {project_id} at instance '{}'..", instance.public_url);
+
+    let url = format!("{}/api/v4/projects/{project_id}", instance.public_url);
+
+    debug!("url: {url}");
+
+    let response = client.post(url)
+        .header(PRIVATE_TOKEN_HEADER, instance.token.to_string())
+        .send().context("gitlab api communication error")?;
+
+    let response_status = response.status();
+
+    if response_status == reqwest::StatusCode::ACCEPTED {
+        info!("project '{project_id}' has been removed");
+
+        Ok(())
+
+    } else {
+        error!("unexpected server response code {}", response_status);
+        Err(anyhow!("unexpected server response"))
+    }
+}

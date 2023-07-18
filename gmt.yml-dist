@@ -2,6 +2,13 @@ log-level: info
 
 git-bin-path: '/usr/bin/git'
 
+error-handlers:
+  # Remove repository on target GitLab instance if `git clone & push` step(s) has error(s) (permissions, connection timeouts, etc.).
+  #
+  # Disabled by default for data safety,
+  # but required if you want to resume process after clone error without any manual work.
+  remove-target-repo-after-clone-error: false
+
 source:
   public-url: 'https://old-gitlab.company.com'
 

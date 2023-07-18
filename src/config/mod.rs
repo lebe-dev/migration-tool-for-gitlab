@@ -11,6 +11,8 @@ pub struct AppConfig {
     pub git_bin_path: String,
     pub source: InstanceConfig,
     pub target: InstanceConfig,
+
+    pub error_handlers: ErrorHandlersConfig
 }
 
 impl Display for AppConfig {
@@ -31,5 +33,19 @@ pub struct InstanceConfig {
 impl Display for InstanceConfig {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "public-url: {}, git-url: {}, token: ***********", self.public_url, self.git_url)
+    }
+}
+
+#[derive(Deserialize,Debug,Clone,PartialEq)]
+#[serde(rename_all = "kebab-case")]
+pub struct ErrorHandlersConfig {
+    /// Remove repository on target GitLab instance
+    /// if `clone & push` step has error(s) (permissions, connection timeouts, etc.).
+    pub remove_target_repo_after_clone_error: bool
+}
+
+impl Display for ErrorHandlersConfig {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "remove-target-repo-after-clone-error: {}", self.remove_target_repo_after_clone_error)
     }
 }

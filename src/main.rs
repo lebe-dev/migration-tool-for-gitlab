@@ -40,8 +40,10 @@ fn main() {
 
                     match matches.subcommand_matches(MIGRATE_COMMAND) {
                         Some(_) => {
+                            println!("migrating..");
 
-                            match migrate_gitlab_instance(&app_config.source, &app_config.target) {
+                            match migrate_gitlab_instance(&app_config.source, &app_config.target,
+                                                          &app_config.error_handlers) {
                                 Ok(_) => {
                                     println!("-----");
                                     println!("migration completed");

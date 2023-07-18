@@ -2,11 +2,11 @@ use anyhow::Context;
 use log::{error, info};
 use reqwest::blocking::{Client, ClientBuilder};
 
-use crate::config::InstanceConfig;
+use crate::config::{ErrorHandlersConfig, InstanceConfig};
 use crate::git::clone::copy_git_repo_from_one_remote_to_another;
 use crate::migration::domain::GitLabGroup;
 use crate::migration::group::{create_gitlab_private_group, get_all_groups};
-use crate::migration::project::{create_gitlab_private_project, get_all_projects, get_project_branches};
+use crate::migration::project::{create_gitlab_private_project, get_all_projects, get_project_branches, remove_gitlab_project};
 
 pub mod domain;
 pub mod group;
@@ -14,7 +14,8 @@ pub mod project;
 
 pub const PRIVATE_TOKEN_HEADER: &str = "PRIVATE-TOKEN";
 
-pub fn migrate_gitlab_instance(source: &InstanceConfig, target: &InstanceConfig) -> anyhow::Result<()> {
+pub fn migrate_gitlab_instance(source: &InstanceConfig, target: &InstanceConfig,
+                               error_handlers: &ErrorHandlersConfig) -> anyhow::Result<()> {
     info!("migrating groups and projects from '{}' to '{}'..", source.public_url, target.public_url);
 
     let client = ClientBuilder::new().build().unwrap();
@@ -66,17 +67,32 @@ pub fn migrate_gitlab_instance(source: &InstanceConfig, target: &InstanceConfig)
                                     &client, &source, source_project.id)
                                     .context("unable to get source project branches")?;
 
-                                create_gitlab_private_project(
+                                let new_projects = create_gitlab_private_project(
                                     &client, &target, target_group.id,
                                     &source_project.name, &source_project.path
                                 ).context("cannot create project on target instance")?;
 
                                 if !source_project_branches.is_empty() {
-                                    copy_git_repo_from_one_remote_to_another(
+                                    match copy_git_repo_from_one_remote_to_another(
                                         &source_project.path, &source.git_url,
                                         &source_group.full_path, &target_group.full_path,
                                         &target.git_url
-                                    ).context("unable to clone repo from source to destination")?;
+                                    ) {
+                                        Ok(_) => {}
+                                        Err(e) => {
+                                            error!("repo copy error: {}", e);
+                                            error!("{}", e.root_cause());
+
+                                            if error_handlers.remove_target_repo_after_clone_error {
+                                                let target_project = new_projects.first().unwrap();
+                                                info!("removing target repo '{}' after git clone/push error(s)..", target_project.path);
+                                                remove_gitlab_project(&client, &target, target_project.id)
+                                                    .context("unable to remove repository on target instance")?;
+                                            }
+
+                                            break;
+                                        }
+                                    }
                                 }
 
                             }
