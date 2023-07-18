@@ -6,7 +6,7 @@ Migrate groups and projects from one gitlab instance to another.
 
 **1. Make backup**
 
-Tool doesn't contain any API delete-calls against GitLab instances, despite this you have to backup your data before migration process.
+Tool doesn't contain any API delete-calls against source GitLab instance, despite this you have to backup your data before migration process.
 Migration tool provided AS IS, NO WARRANTY :)
 
 **2. Prepare config:**
@@ -23,9 +23,11 @@ Edit `gmt.yml`.
 ./gmt migrate
 ```
 
+Check `gmt.log` for migration progress and details.
+
 ## Limitations
 
-- Two levels of groups. Examples: `GroupName` or `Groupname/SubGroupName`. No deeper levels are supported.
+- Two levels of groups are supported. Examples: `GroupName` or `Groupname/SubGroupName`..
 - Target repos will have `private` visibility
 - No user permissions support
 - Tool tested with environment:
@@ -33,6 +35,14 @@ Edit `gmt.yml`.
   - Source GitLab v10.x
   - Target GitLab v16.x
   - git v2.41.0
+- Doesn't support retry for migration steps
+
+## Resume process
+
+Tool doesn't support any kind of retry for migration steps, but you can re-run application and it will skip migrated projects.
+
+For fresh target instance (GitLab) I would recommend you to enable `error-handlers.remove-target-repo-after-clone-error`.
+
 
 ## Troubleshooting
 
