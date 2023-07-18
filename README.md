@@ -45,6 +45,7 @@ Check `gmt.log` for migration progress and details.
   - Source GitLab v10.x
   - Target GitLab v16.x
   - git v2.41.0
+  - Projects migrated: 150+
 
 ## Safety
 
