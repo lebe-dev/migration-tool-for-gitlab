@@ -39,9 +39,9 @@ Check `gmt.log` for migration progress and details.
 
 ## Resume process
 
-Tool doesn't support any kind of retry for migration steps, but you can re-run application and it will skip migrated projects.
+Tool doesn't support any kind of retry for migration steps, if you want to resume interrupted process just restart the app.
 
-For fresh target instance (GitLab) I would recommend you to enable `error-handlers.remove-target-repo-after-clone-error`.
+Also for fresh target instance (GitLab) I would recommend you to enable `error-handlers.remove-target-repo-after-clone-error`.
 
 
 ## Troubleshooting
