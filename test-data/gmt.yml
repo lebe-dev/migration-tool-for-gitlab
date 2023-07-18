@@ -2,6 +2,9 @@ log-level: debug
 
 git-bin-path: '/usr/bin/git'
 
+migration:
+  ignore-empty-repos: true
+
 error-handlers:
   remove-target-repo-after-clone-error: true
 
@@ -12,5 +15,5 @@ source:
 
 target:
   public-url: 'https://gitlab.company.com'
-  git-url: 'ssh://gitlab.company.com'
+  git-url: 'ssh://gitlab.company.com:22'
   token: 'Fv034g3049gj290j23A'

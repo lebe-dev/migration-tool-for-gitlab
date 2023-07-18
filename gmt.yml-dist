@@ -2,6 +2,10 @@ log-level: info
 
 git-bin-path: '/usr/bin/git'
 
+migration:
+  # Do not migrate empty projects (without branches)
+  ignore-empty-repos: false
+
 error-handlers:
   # Remove repository on target GitLab instance if `git clone & push` step(s) has error(s) (permissions, connection timeouts, etc.).
   #

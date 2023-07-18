@@ -16,7 +16,7 @@ Edit `gmt.yml`.
 
 **1. Make backup**
 
-Tool doesn't contain any API delete-calls against source GitLab instance, despite this you have to backup your data before migration process.
+Tool doesn't contain any API delete-calls against source GitLab instance, despite this you have to backup your data before migration.
 Migration tool provided AS IS, NO WARRANTY :)
 
 **2. Do migration:**

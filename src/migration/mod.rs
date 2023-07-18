@@ -2,7 +2,7 @@ use anyhow::Context;
 use log::{error, info};
 use reqwest::blocking::{Client, ClientBuilder};
 
-use crate::config::{ErrorHandlersConfig, InstanceConfig};
+use crate::config::{ErrorHandlersConfig, InstanceConfig, MigrationConfig};
 use crate::git::clone::copy_git_repo_from_one_remote_to_another;
 use crate::migration::domain::GitLabGroup;
 use crate::migration::group::{create_gitlab_private_group, get_all_groups};
@@ -15,6 +15,7 @@ pub mod project;
 pub const PRIVATE_TOKEN_HEADER: &str = "PRIVATE-TOKEN";
 
 pub fn migrate_gitlab_instance(source: &InstanceConfig, target: &InstanceConfig,
+                               migration_config: &MigrationConfig,
                                error_handlers: &ErrorHandlersConfig) -> anyhow::Result<()> {
     info!("migrating groups and projects from '{}' to '{}'..", source.public_url, target.public_url);
 
@@ -67,32 +68,39 @@ pub fn migrate_gitlab_instance(source: &InstanceConfig, target: &InstanceConfig,
                                     &client, &source, source_project.id)
                                     .context("unable to get source project branches")?;
 
-                                let new_projects = create_gitlab_private_project(
-                                    &client, &target, target_group.id,
-                                    &source_project.name, &source_project.path
-                                ).context("cannot create project on target instance")?;
+                                if is_migration_allowed(migration_config.ignore_empty_repos,
+                                        source_project_branches.is_empty()) {
 
-                                if !source_project_branches.is_empty() {
-                                    match copy_git_repo_from_one_remote_to_another(
-                                        &source_project.path, &source.git_url,
-                                        &source_group.full_path, &target_group.full_path,
-                                        &target.git_url
-                                    ) {
-                                        Ok(_) => {}
-                                        Err(e) => {
-                                            error!("repo copy error: {}", e);
-                                            error!("{}", e.root_cause());
+                                    let new_projects = create_gitlab_private_project(
+                                        &client, &target, target_group.id,
+                                        &source_project.name, &source_project.path
+                                    ).context("cannot create project on target instance")?;
 
-                                            if error_handlers.remove_target_repo_after_clone_error {
-                                                let target_project = new_projects.first().unwrap();
-                                                info!("removing target repo '{}' after git clone/push error(s)..", target_project.path);
-                                                remove_gitlab_project(&client, &target, target_project.id)
-                                                    .context("unable to remove repository on target instance")?;
+                                    if !source_project_branches.is_empty() {
+                                        match copy_git_repo_from_one_remote_to_another(
+                                            &source_project.path, &source.git_url,
+                                            &source_group.full_path, &target_group.full_path,
+                                            &target.git_url
+                                        ) {
+                                            Ok(_) => {}
+                                            Err(e) => {
+                                                error!("repo copy error: {}", e);
+                                                error!("{}", e.root_cause());
+
+                                                if error_handlers.remove_target_repo_after_clone_error {
+                                                    let target_project = new_projects.first().unwrap();
+                                                    info!("removing target repo '{}' after git clone/push error(s)..", target_project.path);
+                                                    remove_gitlab_project(&client, &target, target_project.id)
+                                                        .context("unable to remove repository on target instance")?;
+                                                }
+
+                                                break;
                                             }
-
-                                            break;
                                         }
                                     }
+
+                                } else {
+                                    info!("migrate is not allowed for empty repo '{}'", source_project.path)
                                 }
 
                             }
@@ -100,7 +108,7 @@ pub fn migrate_gitlab_instance(source: &InstanceConfig, target: &InstanceConfig,
                         }
 
                     }
-                    Some(_) => info!("project '{}' already migrated, skip", source_project.name)
+                    Some(_) => info!("project '{}' already migrated, skip", source_project.path)
                 }
             }
             None => error!("source group wasn't found by id {}", source_project.namespace.id)
@@ -111,6 +119,10 @@ pub fn migrate_gitlab_instance(source: &InstanceConfig, target: &InstanceConfig,
     }
 
     Ok(())
+}
+
+fn is_migration_allowed(ignore_empty_repos: bool, source_project_is_empty: bool) -> bool {
+    (ignore_empty_repos && !source_project_is_empty) || !ignore_empty_repos
 }
 
 fn create_groups_on_target_instance(client: &Client, source_groups: &Vec<GitLabGroup>,
@@ -182,4 +194,25 @@ fn create_groups_on_target_instance(client: &Client, source_groups: &Vec<GitLabG
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests_is_migration_allowed {
+    use crate::migration::is_migration_allowed;
+
+    #[test]
+    fn ignore_empty_repos_flag_deny_to_migrate_project() {
+        assert!(!is_migration_allowed(true, true));
+    }
+
+    #[test]
+    fn tolerate_empty_repos_without_force_flag() {
+        assert!(is_migration_allowed(false, true));
+    }
+
+    #[test]
+    fn allow_non_empty_repos() {
+        assert!(is_migration_allowed(true, false));
+        assert!(is_migration_allowed(false, false));
+    }
 }

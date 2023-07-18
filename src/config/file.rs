@@ -27,7 +27,7 @@ pub fn load_config_from_file(config_path: &Path) -> anyhow::Result<AppConfig> {
 mod tests {
     use std::path::Path;
 
-    use crate::config::{AppConfig, ErrorHandlersConfig, InstanceConfig};
+    use crate::config::{AppConfig, ErrorHandlersConfig, InstanceConfig, MigrationConfig};
     use crate::config::file::load_config_from_file;
     use crate::tests::init_logging;
 
@@ -51,8 +51,12 @@ mod tests {
 
             target: InstanceConfig {
                 public_url: "https://gitlab.company.com".to_string(),
-                git_url: "ssh://gitlab.company.com".to_string(),
+                git_url: "ssh://gitlab.company.com:22".to_string(),
                 token: "Fv034g3049gj290j23A".to_string(),
+            },
+
+            migration: MigrationConfig {
+                ignore_empty_repos: true,
             },
 
             error_handlers: ErrorHandlersConfig {

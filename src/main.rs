@@ -25,8 +25,7 @@ const EXIT_CODE_ERROR: i32 = -1;
 
 fn main() {
     let matches = App::new("Migration Tool for GitLab")
-        .version("0.2.0")
-        .author("Eugene Lebedev <eugene.0x90@gmail.com>")
+        .version("0.3.0")
         .about("Migrate groups and projects from one GitLab instance to another.")
         .subcommand(SubCommand::with_name(MIGRATE_COMMAND)
             .about("Migrate groups and projects from source GitLab instance to target instance")
@@ -50,6 +49,7 @@ fn main() {
                             println!("migrating..");
 
                             match migrate_gitlab_instance(&app_config.source, &app_config.target,
+                                                          &app_config.migration,
                                                           &app_config.error_handlers) {
                                 Ok(_) => {
                                     println!("-----");
