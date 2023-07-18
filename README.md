@@ -4,12 +4,7 @@ Migrate groups and projects from one gitlab instance to another.
 
 ## How to use
 
-**1. Make backup**
-
-Tool doesn't contain any API delete-calls against source GitLab instance, despite this you have to backup your data before migration process.
-Migration tool provided AS IS, NO WARRANTY :)
-
-**2. Prepare config:**
+Prepare config:
 
 ```shell
 cp gmt.yml-dist gmt.yml
@@ -17,13 +12,26 @@ cp gmt.yml-dist gmt.yml
 
 Edit `gmt.yml`.
 
-**3. Do migration:**
+### 1. Migration
+
+**1. Make backup**
+
+Tool doesn't contain any API delete-calls against source GitLab instance, despite this you have to backup your data before migration process.
+Migration tool provided AS IS, NO WARRANTY :)
+
+**2. Do migration:**
 
 ```shell
 ./gmt migrate
 ```
 
 Check `gmt.log` for migration progress and details.
+
+### 2. Show empty projects
+
+```shell
+./gmt show-empty
+```
 
 ## Limitations
 
