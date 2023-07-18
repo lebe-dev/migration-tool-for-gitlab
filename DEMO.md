@@ -1,6 +1,6 @@
 # Demo environment
 
-If you want to try tool before real migration, you can use demo environment. Data will be copied from to gitlab demo instance. 
+If you want to try tool before real migration, you can spin up a demo environment. Data will be copied from to gitlab demo instance. 
 This document describes how to do it.
 
 **1. Install docker and docker-compose**

@@ -46,6 +46,10 @@ Check `gmt.log` for migration progress and details.
   - Target GitLab v16.x
   - git v2.41.0
 
+## Safety
+
+- Tool doesn't remove or modify anything on source GitLab instance
+
 ## How to resume the process
 
 Tool doesn't support any kind of retry mechanism for migration steps (connection issues, etc.). 
